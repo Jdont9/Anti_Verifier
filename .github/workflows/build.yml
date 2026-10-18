@@ -24,12 +24,21 @@ jobs:
           echo "versionCode=$versionCode" >> "$GITHUB_OUTPUT"
           echo "zip=AntiVerifier-$version.zip" >> "$GITHUB_OUTPUT"
 
+      - name: Generate .sha256 files required by the installer
+        run: |
+          cd module
+          find . -type f ! -name '*.sha256' | while read -r f; do
+            sha256sum "$f" | cut -d' ' -f1 > "$f.sha256"
+          done
+          echo "Generated:"
+          find . -name '*.sha256' | sort
+
       - name: Build module zip
         run: |
           cd module
           zip -r "../${{ steps.meta.outputs.zip }}" .
           cd ..
-          unzip -l "${{ steps.meta.outputs.zip }}" | head -20
+          unzip -l "${{ steps.meta.outputs.zip }}"
 
       - name: Create release and upload zip
         env:

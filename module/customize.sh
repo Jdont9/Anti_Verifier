@@ -92,7 +92,7 @@ extract() {
 
 extract_verifier_placeholder() {
 
-    found_apk="$(unzip -l "$ZIPFILE" "system/app/$VERIFIER_PKG/*.apk" 2>/dev/null | grep -o 'system/app/[^ ]*\.apk' | head -n 1)"
+    found_apk="$(unzip -l "$ZIPFILE" 2>/dev/null | grep "system/app/$VERIFIER_PKG/" | grep '\.apk' | grep -o 'system/app/[^ ]*\.apk' | head -n 1)"
 
     [ -n "$found_apk" ] || abort "! Developer Verifier placeholder APK missing in system/app/$VERIFIER_PKG/"
 
