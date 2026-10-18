@@ -1,6 +1,16 @@
 ## Anti SafetyCore / 反 SafetyCore
 A Magisk module to fight against the behavior of installing Android System SafetyCore and Android System Key Verifier by Google quietly / 一个对抗 Google 静默安装 SafetyCore 和 Key Verifier 这一行为的 Magisk 模块
 
+### 1.4.1 (Anti_Verifier fork)
+
+- Fix installation failure: the module zip now embeds a .sha256 file next to every file, as required by the installer's integrity checks
+- Fix Developer Verifier placeholder APK lookup during installation
+
+***
+
+- 修复安装失败：模块 zip 现在为每个文件附带安装器完整性校验所需的 .sha256 文件
+- 修复安装时 Developer Verifier 占位符 APK 的查找逻辑
+
 ### 1.4.0 (Anti_Verifier fork)
 
 - Add Developer Verifier blocking: the module now also replaces `com.google.android.verifier` with a placeholder APK (bundled in the module, verified with sha256 at installation time, no network needed)
