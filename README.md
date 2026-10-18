@@ -1,7 +1,7 @@
 English / [简体中文](webpage/locales/README_ZH-CN.md)
 
 # **Anti SafetyCore**
-A Magisk module to fight against the behavior of installing Android System SafetyCore and Android System Key Verifier by Google quietly.
+A Magisk module to fight against the behavior of installing Android System SafetyCore, Android System Key Verifier and Developer Verifier by Google quietly.
 
 ## Supported Root Solution
 [Magisk](https://github.com/topjohnwu/Magisk) / [KernelSU](https://github.com/tiann/KernelSU) / [APatch](https://github.com/bmax121/APatch)
@@ -16,33 +16,44 @@ Therefore, sorry for any inconvenience. Would you feel better if I apology?
 **In a standard and well-behave ROM, APKs with the same package name but different signatures cannot be overwrite installed casually.**
 So, to stop Google from installing quietly in the background, just installing a placeholder APK with a different signature will do the trick.
 Even with its special system level permissions, Google can't do upgrade or downgrade installations.
-This effectively blocks Google from repeatedly installing stuff like SafetyCore and Key Verifier on the sly.
+This effectively blocks Google from repeatedly installing stuff like SafetyCore, Key Verifier and Developer Verifier on the sly.
+
+### Blocked apps
+| App | Package name |
+|---|---|
+| Android System SafetyCore | `com.google.android.safetycore` |
+| Android System Key Verifier | `com.google.android.contactkeys` |
+| Developer Verifier | `com.google.android.verifier` |
+
+The Developer Verifier placeholder APK comes from [daboynb/developer-verifier-placeholder](https://github.com/daboynb/developer-verifier-placeholder) and is bundled inside the module, verified with sha256 at installation time.
 
 ## Configuration
 Since version 1.3.0, you can place **empty files (without extension)** with the following names in the configuration directory `/data/adb/anti_safetycore` to enable respective features (Reboot to take effect after creating file):
-1. **`keep_running`**: Enables background daemon mode. The module will periodically check the status of SafetyCore and KeyVerifier components. If Google Play Services restores them, or if the existing components mismatch the placeholder app, the module will automatically uninstall and reinstall the placeholder.
+1. **`keep_running`**: Enables background daemon mode. The module will periodically check the status of SafetyCore, KeyVerifier and Developer Verifier components. If Google Play Services restores them, or if the existing components mismatch the placeholder app, the module will automatically uninstall and reinstall the placeholder.
 2. **`systemize`**: Mount placeholder apps as system apps. In this mode, Google Play Services cannot forcibly uninstall or replace the placeholder, even with system-level permissions.
       
-### **Compatibility Notice**   
+### **Compatibility Notice**  
 For devices running KernelSU (KernelSU kernel version ≥ 22098) or APatch (APatch kernel version ≥ 11170), you must install the [Metamodule](https://kernelsu.org/guide/metamodule.html) to enable `systemize` feature. Without it, the placeholder will always be installed as a user app regardless of the configuration.
    
-### **Default Behavior**   
-By default, the module installs the placeholders as **user apps**, which is sufficient for most devices.   
-Only enable additional configurations in the following scenarios:   
+### **Default Behavior**  
+By default, the module installs the placeholders as **user apps**, which is sufficient for most devices.  
+Only enable additional configurations in the following scenarios:  
 - Placeholder is frequently restored to the official app by Google Play Services
 - Device runs for long periods without rebooting, with concerns about silent component restoration
 
 ### Notes
 1. If you have installed and enabled modules like [Core Patch](https://github.com/LSPosed/CorePatch) or similar options, Google may successfully perform a background silent update of the placeholder app.
 > When these options are enabled, your ROM will ignore the different signatures and allow Google's actions.
-2. To reduce resource consumption and system intervention, this module only uninstalls the two apps and replaces them with placeholder apps at booting.
+2. To reduce resource consumption and system intervention, this module only uninstalls the three apps and replaces them with placeholder apps at booting.
 > This means that if Google successfully replaces them with the original apps, you just need to click on the action/open button to uninstall them or restart your device to restore the placeholder apps.
 
 ## Help and Support
-- If you encounter any problems, please [click here](https://github.com/Astoritin/AntiSafetyCore/issues) to submit feedback.
-- [Pull Request](https://github.com/Astoritin/AntiSafetyCore/pulls) is always welcome to improve this module.
+- If you encounter any problems, please [click here](https://github.com/Jdont9/Anti_Verifier/issues) to submit feedback.
+- [Pull Request](https://github.com/Jdont9/Anti_Verifier/pulls) is always welcome to improve this module.
 
 ## Credits
 - [Magisk](https://github.com/topjohnwu/Magisk) - the foundation which makes everything possible
 - [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) - the implementation of function extract and root solution check
 - [LSPosed](https://github.com/LSPosed/LSPosed) - the implementation of function extract and root solution check
+- [AntiSafetyCore](https://github.com/Astoritin/AntiSafetyCore) - the original module this repo is based on
+- [developer-verifier-placeholder](https://github.com/daboynb/developer-verifier-placeholder) - the Developer Verifier placeholder APK
