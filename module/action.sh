@@ -23,7 +23,7 @@ uninstall_app() {
     fi
 }
 
-MOD_INTRO="GET LOST, SafetyCore & KeyVerifier!"
+MOD_INTRO="GET LOST, SafetyCore & KeyVerifier & Developer Verifier!"
 
 ecol
 eco "Anti SafetyCore"
@@ -32,7 +32,7 @@ ecol
 eco "$MOD_INTRO"
 ecol
 eco "This action will uninstall current"
-eco "SafetyCore & KeyVerifier app"
+eco "SafetyCore, KeyVerifier & Developer Verifier app"
 ecol
 eco "Just a workaround of shameless Google"
 eco "installing original apps"
@@ -46,5 +46,7 @@ sleep 2
 uninstall_app "com.google.android.safetycore" "SafetyCore"
 sleep 1
 uninstall_app "com.google.android.contactkeys" "KeyVerifier"
+sleep 1
+uninstall_app "com.google.android.verifier" "Developer Verifier"
 ecol
 eco "Done"

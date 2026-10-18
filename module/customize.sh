@@ -26,6 +26,12 @@ CLEANUP_PATH="${POST_D}/${CLEANUP_SH}"
 MIN_VER_KERNELSU_TRY_METAMODULE=22098
 MIN_VER_APATCH_TRY_METAMODULE=11170
 
+VERIFIER_PKG="com.google.android.verifier"
+VERIFIER_APK="com.google.android.verifier.apk"
+VERIFIER_URL="https://github.com/daboynb/developer-verifier-placeholder/releases/download/v3000000000000/developer-verifier-v3000000000000.apk"
+VERIFIER_SHA256="da685d6cce4c5f6284fa79c39e81d0f7479c120e2aaac0f32fd0ef029b99691a"
+VERIFIER_DIR="$MODPATH/system/app/$VERIFIER_PKG"
+
 mark_keep_running=false
 mark_systemize=false
 
@@ -46,6 +52,7 @@ ecol() {
     symbol=*
 
     line=$(printf "%-${length}s" | tr ' ' "$symbol")
+
     ui_print "$line"
 
 }
@@ -104,6 +111,36 @@ metamodule_required() {
 
 }
 
+download_verifier_placeholder() {
+
+    verifier_tmp="$PLACEHOLDER_DIR/$VERIFIER_APK"
+
+    if [ -f "$verifier_tmp" ] && [ "$(sha256sum "$verifier_tmp" | cut -d ' ' -f1)" = "$VERIFIER_SHA256" ]; then
+        mkdir -p "$VERIFIER_DIR"
+        cp "$verifier_tmp" "$VERIFIER_DIR/$VERIFIER_APK"
+        ui_print "- Verified $VERIFIER_APK"
+        return 0
+    fi
+
+    rm -f "$verifier_tmp"
+    ui_print "- Downloading $VERIFIER_APK"
+    mkdir -p "$VERIFIER_DIR"
+    if curl -L --fail --retry 3 --connect-timeout 15 -o "$verifier_tmp" "$VERIFIER_URL" \
+        && [ "$(sha256sum "$verifier_tmp" | cut -d ' ' -f1)" = "$VERIFIER_SHA256" ]; then
+        cp "$verifier_tmp" "$VERIFIER_DIR/$VERIFIER_APK"
+        ui_print "- Verified $VERIFIER_APK"
+        return 0
+    fi
+
+    ui_print "! Failed to download $VERIFIER_APK"
+    ui_print "! Developer Verifier blocking skipped"
+    ui_print "! Reinstall this module with network access"
+    ui_print "! to enable Developer Verifier blocking"
+    rm -f "$verifier_tmp" "$VERIFIER_DIR/$VERIFIER_APK"
+    return 1
+
+}
+
 extract "customize.sh" "$TMPDIR" >/dev/null 2>&1
 extract "wanderer.sh" "$TMPDIR" >/dev/null 2>&1
 . "$TMPDIR/wanderer.sh"
@@ -129,6 +166,7 @@ extract "system/app/com.google.android.contactkeys/com.google.android.contactkey
 extract "system/app/com.google.android.safetycore/com.google.android.safetycore.apk"
 extract "system/app/com.google.android.contactkeys/com.google.android.contactkeys.apk" "$PLACEHOLDER_DIR" "true" > /dev/null 2>&1
 extract "system/app/com.google.android.safetycore/com.google.android.safetycore.apk" "$PLACEHOLDER_DIR" "true" > /dev/null 2>&1
+download_verifier_placeholder
 [ "$mark_keep_running" = false ] || touch "$MARK_KEEP_RUNNING" 
 [ "$mark_systemize" = true ] && rm -f "$MODPATH/skip_mount" && touch "$MARK_SYSTEMIZE"
 [ "$mark_systemize" = false ] && touch "$MODPATH/skip_mount"
@@ -143,19 +181,22 @@ ecos "uninstall and reinstall SafetyCore"
 ecos "and KeyVerifier with placeholder APPs"
 ecos "on every boot"
 ecoe
+ecos "Developer Verifier placeholder is"
+ecos "downloaded during installation"
+ecoe
 ecos "To prevent these APPs from being"
 ecos "quietly restored by Google background updates"
 ecos "during daily use, please ensure"
 ecos "the following options are DISABLED:"
 ecoe
-ecos "• Allow downgrade installation"
-ecos "• Disable compare signatures"
+ecos "â¢ Allow downgrade installation"
+ecos "â¢ Disable compare signatures"
 ecos "  (or disable signature verification)"
 ecoe
 ecos "These settings are commonly found in:"
 ecoe
-ecos "• Xposed modules (e.g. Core Patch)"
-ecos "• Some custom ROMs' built-in options"
+ecos "â¢ Xposed modules (e.g. Core Patch)"
+ecos "â¢ Some custom ROMs' built-in options"
 ecoe
 ecos "        REBOOT TO TAKE EFFECT"
 ecoe
@@ -165,3 +206,4 @@ ecol
 ui_print "- Setting permissions"
 set_perm_recursive "$MODPATH" 0 0 0755 0644
 ui_print "- Welcome to $MOD_NAME!"
+

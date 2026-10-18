@@ -1,7 +1,9 @@
 id=anti_safetycore
 name=Anti SafetyCore
-version=1.3.1
-versionCode=131
+version=1.4.0
+versionCode=140
 author=Astoritin
-description=GET LOST, SafetyCore & KeyVerifier!
+description=GET LOST, SafetyCore & KeyVerifier & DevVerifier!
 updateJson=https://raw.githubusercontent.com/Astoritin/AntiSafetyCore/main/webpage/update.json
+Since version 1.4.0, the module also blocks **Developer Verifier** (`com.google.android.verifier`) using the placeholder from [daboynb/developer-verifier-placeholder](https://github.com/daboynb/developer-verifier-placeholder). The placeholder APK is downloaded and verified (sha256) during module installation, so install with network access.
+- [developer-verifier-placeholder](https://github.com/daboynb/developer-verifier-placeholder) - the Developer Verifier placeholder APK

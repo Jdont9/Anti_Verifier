@@ -59,6 +59,7 @@ done
 
 uninstall_package "com.google.android.safetycore"
 uninstall_package "com.google.android.contactkeys"
+uninstall_package "com.google.android.verifier"
 rm -f "/data/adb/service.d/uninstall_anti_safetycore.sh"
 EOF
 

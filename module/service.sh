@@ -11,7 +11,7 @@ MARK_SYSTEMIZE="$CONFIG_DIR/systemize"
 
 module_prop="$MODDIR/module.prop"
 module_id_for_log="Anti_SafetyCore"
-module_description="GET LOST, SafetyCore & KeyVerifier!"
+module_description="GET LOST, SafetyCore & KeyVerifier & DevVerifier!"
 
 MIN_VER_KERNELSU_TRY_METAMODULE=22098
 MIN_VER_APATCH_TRY_METAMODULE=11170
@@ -72,7 +72,7 @@ install_apk() {
     if cp "$apk_path" "$tmp_path"; then
         msg "Copied ${apk_path} -> $tmp_path"
     else
-        msg "Failed to copy ${apk_path} -> ${tmp_path} ($?)" "e"
+        msg "Failed to copy ${apk_path} -> $tmp_path ($?)" "e"
     fi
 
     package_basename=$(basename "$apk_path")
@@ -86,7 +86,7 @@ install_apk() {
     if [ "$result_install_package" -eq 0 ]; then
         msg "Installed ${apk_path}"
     else
-        msg "Failed to install ${apk_path} ($result_install_package)" "e"
+        msg "Failed to install ${apk_path} ($?)" "e"
     fi
 
     return "$result_install_package"
@@ -206,6 +206,7 @@ anti_safetycore() {
     can_systemize=true
     replaced_safetycore=false
     replaced_keyverifier=false
+    replaced_verifier=false
 
     install_env_check
 
@@ -220,24 +221,31 @@ anti_safetycore() {
     checkout_app "com.google.android.safetycore" "$PLACEHOLDER_DIR/com.google.android.safetycore.apk" && replaced_safetycore=true
     checkout_app "com.google.android.contactkeys" "$PLACEHOLDER_DIR/com.google.android.contactkeys.apk" && replaced_keyverifier=true
 
+    if [ -f "$PLACEHOLDER_DIR/com.google.android.verifier.apk" ]; then
+        checkout_app "com.google.android.verifier" "$PLACEHOLDER_DIR/com.google.android.verifier.apk" && replaced_verifier=true
+    else
+        msg "Developer Verifier placeholder not found, skipped" "e"
+    fi
+
 }
 
 module_description_update() {
 
     if [ "$work_mode" = "system" ]; then
-        desc_work_mode="✅Systemized."
+        desc_work_mode="âSystemized."
     elif [ "$can_systemize" = false ]; then
-        desc_work_mode="💡Requires Metamodule to systemize. Installed as user apps for fallback."
+        desc_work_mode="ð¡Requires Metamodule to systemize. Installed as user apps for fallback."
     elif [ "$work_mode" = "user" ]; then
-        desc_work_mode="✅Installed."
+        desc_work_mode="âInstalled."
     fi
 
-    [ "$replaced_safetycore" = true ] && desc_safetycore=" ✅SafetyCore,"
-    [ "$replaced_keyverifier" = true ] && desc_keyverifier=" ✅KeyVerifier,"
+    [ "$replaced_safetycore" = true ] && desc_safetycore=" âSafetyCore,"
+    [ "$replaced_keyverifier" = true ] && desc_keyverifier=" âKeyVerifier,"
+    [ "$replaced_verifier" = true ] && desc_verifier=" âDevVerifier,"
 
-    [ "$checkout_count" -gt 0 ] && desc_schedule=" ✅$checkout_count time(s),"
+    [ "$checkout_count" -gt 0 ] && desc_schedule=" â$checkout_count time(s),"
 
-    DESCRIPTION="[${desc_work_mode}${desc_safetycore}${desc_keyverifier}${desc_schedule} ✅${ROOT_SOL_DETAIL}] $module_description"
+    DESCRIPTION="[${desc_work_mode}${desc_safetycore}${desc_keyverifier}${desc_verifier}${desc_schedule} â${ROOT_SOL_DETAIL}] $module_description"
     update_key_value "description" "$module_prop" "$DESCRIPTION"
 
 }
