@@ -28,7 +28,6 @@ MIN_VER_APATCH_TRY_METAMODULE=11170
 
 VERIFIER_PKG="com.google.android.verifier"
 VERIFIER_APK="com.google.android.verifier.apk"
-VERIFIER_ZIP_PATH="system/app/$VERIFIER_PKG/$VERIFIER_APK"
 VERIFIER_SHA256="da685d6cce4c5f6284fa79c39e81d0f7479c120e2aaac0f32fd0ef029b99691a"
 VERIFIER_DIR="$MODPATH/system/app/$VERIFIER_PKG"
 
@@ -93,20 +92,25 @@ extract() {
 
 extract_verifier_placeholder() {
 
-    mkdir -p "$VERIFIER_DIR" || abort "! Failed to create dir $VERIFIER_DIR!"
+    found_apk="$(unzip -l "$ZIPFILE" "system/app/$VERIFIER_PKG/*.apk" 2>/dev/null | grep -o 'system/app/[^ ]*\.apk' | head -n 1)"
 
-    unzip -o "$ZIPFILE" "$VERIFIER_ZIP_PATH" -d "$MODPATH" >&2
-    [ -f "$VERIFIER_DIR/$VERIFIER_APK" ] || abort "! $VERIFIER_ZIP_PATH does NOT exist"
+    [ -n "$found_apk" ] || abort "! Developer Verifier placeholder APK missing in system/app/$VERIFIER_PKG/"
 
-    calculated_hash="$(sha256sum "$VERIFIER_DIR/$VERIFIER_APK" | cut -d ' ' -f1)"
+    unzip -o "$ZIPFILE" "$found_apk" -d "$MODPATH" >&2
+    apk_tmp_path="$MODPATH/$found_apk"
+    [ -f "$apk_tmp_path" ] || abort "! $found_apk does NOT exist"
+
+    calculated_hash="$(sha256sum "$apk_tmp_path" | cut -d ' ' -f1)"
 
     if [ "$VERIFIER_SHA256" == "$calculated_hash" ]; then
-        ui_print "- Verified $VERIFIER_ZIP_PATH" >&1
+        ui_print "- Verified $found_apk" >&1
     else
-        abort "! Failed to verify $VERIFIER_ZIP_PATH"
+        abort "! Failed to verify $found_apk"
     fi
 
-    cp "$VERIFIER_DIR/$VERIFIER_APK" "$PLACEHOLDER_DIR/$VERIFIER_APK"
+    mkdir -p "$PLACEHOLDER_DIR" "$VERIFIER_DIR"
+    mv -f "$apk_tmp_path" "$PLACEHOLDER_DIR/$VERIFIER_APK"
+    cp "$PLACEHOLDER_DIR/$VERIFIER_APK" "$VERIFIER_DIR/$VERIFIER_APK"
 
 }
 
