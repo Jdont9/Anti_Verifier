@@ -1,7 +1,7 @@
 id=anti_safetycore
 name=Anti SafetyCore
-version=1.4.1
-versionCode=141
+version=1.4.2
+versionCode=142
 author=Jdont9
 description=GET LOST, SafetyCore & KeyVerifier & DevVerifier!
 updateJson=https://raw.githubusercontent.com/Jdont9/Anti_Verifier/main/webpage/update.json

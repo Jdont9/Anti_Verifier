@@ -179,14 +179,14 @@ ecos "quietly restored by Google background updates"
 ecos "during daily use, please ensure"
 ecos "the following options are DISABLED:"
 ecoe
-ecos "• Allow downgrade installation"
-ecos "• Disable compare signatures"
+ecos "- Allow downgrade installation"
+ecos "- Disable compare signatures"
 ecos "  (or disable signature verification)"
 ecoe
 ecos "These settings are commonly found in:"
 ecoe
-ecos "• Xposed modules (e.g. Core Patch)"
-ecos "• Some custom ROMs' built-in options"
+ecos "- Xposed modules (e.g. Core Patch)"
+ecos "- Some custom ROMs' built-in options"
 ecoe
 ecos "        REBOOT TO TAKE EFFECT"
 ecoe

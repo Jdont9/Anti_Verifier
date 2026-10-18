@@ -232,20 +232,20 @@ anti_safetycore() {
 module_description_update() {
 
     if [ "$work_mode" = "system" ]; then
-        desc_work_mode="âSystemized."
+        desc_work_mode="Systemized."
     elif [ "$can_systemize" = false ]; then
-        desc_work_mode="ð¡Requires Metamodule to systemize. Installed as user apps for fallback."
+        desc_work_mode="Requires Metamodule to systemize, installed as user apps."
     elif [ "$work_mode" = "user" ]; then
-        desc_work_mode="âInstalled."
+        desc_work_mode="Installed."
     fi
 
-    [ "$replaced_safetycore" = true ] && desc_safetycore=" âSafetyCore,"
-    [ "$replaced_keyverifier" = true ] && desc_keyverifier=" âKeyVerifier,"
-    [ "$replaced_verifier" = true ] && desc_verifier=" âDevVerifier,"
+    [ "$replaced_safetycore" = true ] && desc_safetycore=" SafetyCore OK,"
+    [ "$replaced_keyverifier" = true ] && desc_keyverifier=" KeyVerifier OK,"
+    [ "$replaced_verifier" = true ] && desc_verifier=" DevVerifier OK,"
 
-    [ "$checkout_count" -gt 0 ] && desc_schedule=" â$checkout_count time(s),"
+    [ "$checkout_count" -gt 0 ] && desc_schedule=" Checked $checkout_count time(s),"
 
-    DESCRIPTION="[${desc_work_mode}${desc_safetycore}${desc_keyverifier}${desc_verifier}${desc_schedule} â${ROOT_SOL_DETAIL}] $module_description"
+    DESCRIPTION="[${desc_work_mode}${desc_safetycore}${desc_keyverifier}${desc_verifier}${desc_schedule} ${ROOT_SOL_DETAIL}] $module_description"
     update_key_value "description" "$module_prop" "$DESCRIPTION"
 
 }
