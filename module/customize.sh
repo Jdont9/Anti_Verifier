@@ -28,7 +28,7 @@ MIN_VER_APATCH_TRY_METAMODULE=11170
 
 VERIFIER_PKG="com.google.android.verifier"
 VERIFIER_APK="com.google.android.verifier.apk"
-VERIFIER_URL="https://github.com/daboynb/developer-verifier-placeholder/releases/download/v3000000000000/developer-verifier-v3000000000000.apk"
+VERIFIER_ZIP_PATH="system/app/$VERIFIER_PKG/$VERIFIER_APK"
 VERIFIER_SHA256="da685d6cce4c5f6284fa79c39e81d0f7479c120e2aaac0f32fd0ef029b99691a"
 VERIFIER_DIR="$MODPATH/system/app/$VERIFIER_PKG"
 
@@ -91,6 +91,25 @@ extract() {
     fi
 }
 
+extract_verifier_placeholder() {
+
+    mkdir -p "$VERIFIER_DIR" || abort "! Failed to create dir $VERIFIER_DIR!"
+
+    unzip -o "$ZIPFILE" "$VERIFIER_ZIP_PATH" -d "$MODPATH" >&2
+    [ -f "$VERIFIER_DIR/$VERIFIER_APK" ] || abort "! $VERIFIER_ZIP_PATH does NOT exist"
+
+    calculated_hash="$(sha256sum "$VERIFIER_DIR/$VERIFIER_APK" | cut -d ' ' -f1)"
+
+    if [ "$VERIFIER_SHA256" == "$calculated_hash" ]; then
+        ui_print "- Verified $VERIFIER_ZIP_PATH" >&1
+    else
+        abort "! Failed to verify $VERIFIER_ZIP_PATH"
+    fi
+
+    cp "$VERIFIER_DIR/$VERIFIER_APK" "$PLACEHOLDER_DIR/$VERIFIER_APK"
+
+}
+
 metamodule_required() {
 
     if try_metamodule "$1" "$2" "$3"; then
@@ -108,36 +127,6 @@ metamodule_required() {
         fi
         ecoe;ecol
     fi
-
-}
-
-download_verifier_placeholder() {
-
-    verifier_tmp="$PLACEHOLDER_DIR/$VERIFIER_APK"
-
-    if [ -f "$verifier_tmp" ] && [ "$(sha256sum "$verifier_tmp" | cut -d ' ' -f1)" = "$VERIFIER_SHA256" ]; then
-        mkdir -p "$VERIFIER_DIR"
-        cp "$verifier_tmp" "$VERIFIER_DIR/$VERIFIER_APK"
-        ui_print "- Verified $VERIFIER_APK"
-        return 0
-    fi
-
-    rm -f "$verifier_tmp"
-    ui_print "- Downloading $VERIFIER_APK"
-    mkdir -p "$VERIFIER_DIR"
-    if curl -L --fail --retry 3 --connect-timeout 15 -o "$verifier_tmp" "$VERIFIER_URL" \
-        && [ "$(sha256sum "$verifier_tmp" | cut -d ' ' -f1)" = "$VERIFIER_SHA256" ]; then
-        cp "$verifier_tmp" "$VERIFIER_DIR/$VERIFIER_APK"
-        ui_print "- Verified $VERIFIER_APK"
-        return 0
-    fi
-
-    ui_print "! Failed to download $VERIFIER_APK"
-    ui_print "! Developer Verifier blocking skipped"
-    ui_print "! Reinstall this module with network access"
-    ui_print "! to enable Developer Verifier blocking"
-    rm -f "$verifier_tmp" "$VERIFIER_DIR/$VERIFIER_APK"
-    return 1
 
 }
 
@@ -166,7 +155,7 @@ extract "system/app/com.google.android.contactkeys/com.google.android.contactkey
 extract "system/app/com.google.android.safetycore/com.google.android.safetycore.apk"
 extract "system/app/com.google.android.contactkeys/com.google.android.contactkeys.apk" "$PLACEHOLDER_DIR" "true" > /dev/null 2>&1
 extract "system/app/com.google.android.safetycore/com.google.android.safetycore.apk" "$PLACEHOLDER_DIR" "true" > /dev/null 2>&1
-download_verifier_placeholder
+extract_verifier_placeholder
 [ "$mark_keep_running" = false ] || touch "$MARK_KEEP_RUNNING" 
 [ "$mark_systemize" = true ] && rm -f "$MODPATH/skip_mount" && touch "$MARK_SYSTEMIZE"
 [ "$mark_systemize" = false ] && touch "$MODPATH/skip_mount"
@@ -177,26 +166,23 @@ ecoe
 ecol
 ecoe
 ecos "Although $MOD_NAME will automatically"
-ecos "uninstall and reinstall SafetyCore"
-ecos "and KeyVerifier with placeholder APPs"
-ecos "on every boot"
-ecoe
-ecos "Developer Verifier placeholder is"
-ecos "downloaded during installation"
+ecos "uninstall and reinstall SafetyCore,"
+ecos "KeyVerifier and Developer Verifier"
+ecos "with placeholder APPs on every boot"
 ecoe
 ecos "To prevent these APPs from being"
 ecos "quietly restored by Google background updates"
 ecos "during daily use, please ensure"
 ecos "the following options are DISABLED:"
 ecoe
-ecos "â¢ Allow downgrade installation"
-ecos "â¢ Disable compare signatures"
+ecos "• Allow downgrade installation"
+ecos "• Disable compare signatures"
 ecos "  (or disable signature verification)"
 ecoe
 ecos "These settings are commonly found in:"
 ecoe
-ecos "â¢ Xposed modules (e.g. Core Patch)"
-ecos "â¢ Some custom ROMs' built-in options"
+ecos "• Xposed modules (e.g. Core Patch)"
+ecos "• Some custom ROMs' built-in options"
 ecoe
 ecos "        REBOOT TO TAKE EFFECT"
 ecoe
@@ -206,4 +192,3 @@ ecol
 ui_print "- Setting permissions"
 set_perm_recursive "$MODPATH" 0 0 0755 0644
 ui_print "- Welcome to $MOD_NAME!"
-
