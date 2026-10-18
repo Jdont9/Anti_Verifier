@@ -1,6 +1,20 @@
 ## Anti SafetyCore / 反 SafetyCore
 A Magisk module to fight against the behavior of installing Android System SafetyCore and Android System Key Verifier by Google quietly / 一个对抗 Google 静默安装 SafetyCore 和 Key Verifier 这一行为的 Magisk 模块
 
+### 1.4.0 (Anti_Verifier fork)
+
+- Add Developer Verifier blocking: the module now also replaces `com.google.android.verifier` with a placeholder APK (bundled in the module, verified with sha256 at installation time, no network needed)
+- Placeholder from [daboynb/developer-verifier-placeholder](https://github.com/daboynb/developer-verifier-placeholder)
+- Action/open button and uninstall script now handle Developer Verifier as well
+- Module zip is now built and published automatically by GitHub Actions
+
+***
+
+- 新增 Developer Verifier 拦截：模块现在同样会用占位符 APK 替换 `com.google.android.verifier`（内置于模块中，安装时进行 sha256 校验，无需联网）
+- 占位符来自 [daboynb/developer-verifier-placeholder](https://github.com/daboynb/developer-verifier-placeholder)
+- 操作/打开按钮与卸载脚本同样处理 Developer Verifier
+- 模块 zip 现在由 GitHub Actions 自动构建并发布
+
 ### 1.3.0
 
 - Add background daemon mode: The module will periodically check the status of SafetyCore and KeyVerifier components. If Google Play Services restores them, or if the existing components mismatch the placeholder app, the module will automatically uninstall and reinstall the placeholder.
@@ -24,4 +38,4 @@ For devices running KernelSU (KernelSU kernel version ≥ 22098) or APatch (APat
    
    
 **兼容性提示**   
-对于 KernelSU 的内核版本 ≥ 22098 或 APatch 的内核版本 ≥ 11170 的用户，如需启用系统化 (systemize) 功能，必须同时安装 **[元模块 (Metamodule)](https://kernelsu.org/guide/metamodule.html)** ，否则占位符应用仍将作为用户应用安装。   
+对于 KernelSU 的内核版本 ≥ 22098 或 APatch 的内核版本 ≥ 11170 的用户，如需启用系统化 (systemize) 功能，必须同时安装 **[元模块 (Metamodule)](https://kernelsu.org/guide/metamodule.html)** ，否则占位符应用仍将作为用户应用安装。

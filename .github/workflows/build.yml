@@ -1,0 +1,47 @@
+name: Build and release module zip
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read module metadata
+        id: meta
+        run: |
+          version="$(grep '^version=' module/module.prop | cut -d= -f2)"
+          versionCode="$(grep '^versionCode=' module/module.prop | cut -d= -f2)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "versionCode=$versionCode" >> "$GITHUB_OUTPUT"
+          echo "zip=AntiVerifier-$version.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Build module zip
+        run: |
+          cd module
+          zip -r "../${{ steps.meta.outputs.zip }}" .
+          cd ..
+          unzip -l "${{ steps.meta.outputs.zip }}" | head -20
+
+      - name: Create release and upload zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.meta.outputs.version }}"
+          zip="${{ steps.meta.outputs.zip }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$zip" --clobber
+          else
+            gh release create "$tag" "$zip" \
+              --title "Anti SafetyCore ${{ steps.meta.outputs.version }}" \
+              --notes "Blocks SafetyCore, KeyVerifier and Developer Verifier. versionCode ${{ steps.meta.outputs.versionCode }}. The zip contains module.prop at its root, ready to install in Magisk." \
+              --latest
+          fi
